@@ -1,50 +1,50 @@
-import React, { Component } from "react"
-import logo from "./logo.svg"
-import "./App.css"
+import React, { useState } from 'react';
+import './App.css';
+import GitHubLogin from 'react-github-login';
 
-class LambdaDemo extends Component {
-  constructor(props) {
-    super(props)
-    this.state = { loading: false, msg: null }
-  }
+const App = () => {
+  const [auth, setAuth] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState(null);
 
-  handleClick = api => e => {
-    e.preventDefault()
+  const onSuccess = (response) => {
+    const { code } = response;
+    setAuth(code);
+  };
+  const onFailure = (response) => console.error({ response });
 
-    this.setState({ loading: true })
-    fetch("/.netlify/functions/" + api)
-      .then(response => response.json())
-      .then(json => this.setState({ loading: false, msg: json.msg }))
-  }
+  const doCreate = async (e) => {
+    setLoading(true);
+    const response = await fetch(`/.netlify/functions/create?token=${auth}`);
+    const json = await response.json();
+    console.log({ json });
+    window.location.href = json.repoURL;
+  };
 
-  render() {
-    const { loading, msg } = this.state
+  return (
+    <div className="App">
+      <header className="App-header">
+        <p>Agile Blog Project</p>
+        <p>
+          {!auth ? (
+            <GitHubLogin
+              clientId="6683cfa14ce8e331caf7"
+              redirectUri=""
+              onSuccess={onSuccess}
+              onFailure={onFailure}
+              scope="user:email,repo"
+            />
+          ) : (
+            <button onClick={doCreate}>
+              {loading ? 'Generating your repository...' : 'Create Project'}
+            </button>
+          )}
+          <br />
+          <span>{msg}</span>
+        </p>
+      </header>
+    </div>
+  );
+};
 
-    return (
-      <p>
-        <button onClick={this.handleClick("hello")}>{loading ? "Loading..." : "Call Lambda"}</button>
-        <button onClick={this.handleClick("async-dadjoke")}>{loading ? "Loading..." : "Call Async Lambda"}</button>
-        <br />
-        <span>{msg}</span>
-      </p>
-    )
-  }
-}
-
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <LambdaDemo />
-        </header>
-      </div>
-    )
-  }
-}
-
-export default App
+export default App;

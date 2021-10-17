@@ -3,12 +3,17 @@
   "version": "0.5.0",
   "private": true,
   "dependencies": {
+    "@octokit/auth-oauth-app": "^4.3.0",
     "axios": "^0.19.0",
+    "node-fetch": "^3.0.0",
+    "octokit": "^1.7.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
+    "react-github-login": "^1.0.3",
     "react-scripts": "^3.0.1"
   },
   "scripts": {
+    "dev": "netlify dev",
     "start": "react-scripts start",
     "start:lambda": "netlify-lambda serve src/lambda",
     "build": "run-p build:**",
